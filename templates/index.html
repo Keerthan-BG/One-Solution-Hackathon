@@ -1,299 +1,375 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>DynamicShield SOC Command Center</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>One Solution - SecureGram UI</title>
 
-    <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top, #0b1220, #000);
-            color: white;
-            overflow-x: hidden;
-        }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        /* TOP BAR */
-        .topbar {
-            display: flex;
-            justify-content: space-between;
-            padding: 14px 20px;
-            background: rgba(0,0,0,0.6);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
 
-        .logo {
-            font-size: 20px;
-            font-weight: bold;
-            color: #38bdf8;
-        }
+<style>
+body {
+    margin:0;
+    font-family:'Inter', sans-serif;
+    background: radial-gradient(circle at top, #0b1220, #000);
+    color:white;
+}
 
-        .status {
-            background: #22c55e;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-        }
+/* TOP BAR */
+.topbar {
+    display:flex;
+    justify-content:space-between;
+    padding:14px;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid rgba(255,255,255,0.1);
+}
 
-        /* GRID */
-        .grid {
-            display: grid;
-            grid-template-columns: 1.2fr 1fr 1fr;
-            gap: 15px;
-            padding: 15px;
-        }
+.logo {
+    font-weight:700;
+    color:#38bdf8;
+}
 
-        .card {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 14px;
-            padding: 15px;
-            backdrop-filter: blur(12px);
-        }
+.status {
+    background:#22c55e;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:12px;
+}
 
-        h3 {
-            margin-top: 0;
-            color: #38bdf8;
-        }
+/* GRID */
+.container {
+    display:grid;
+    grid-template-columns: 1.6fr 1fr 1fr;
+    gap:15px;
+    padding:15px;
+}
 
-        /* PORT */
-        .port {
-            font-size: 42px;
-            text-align: center;
-            color: #22c55e;
-            animation: glow 2s infinite alternate;
-        }
+/* GLASS CARDS */
+.card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius:16px;
+    padding:12px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    height:92vh;
+    overflow:hidden;
+}
 
-        @keyframes glow {
-            from { text-shadow: 0 0 10px #22c55e; }
-            to { text-shadow: 0 0 25px #22c55e; }
-        }
+h3 {
+    margin-top:0;
+    color:#38bdf8;
+}
 
-        /* LOGS */
-        #logs {
-            height: 280px;
-            overflow-y: auto;
-            font-size: 12px;
-            background: rgba(0,0,0,0.4);
-            padding: 10px;
-            border-radius: 10px;
-        }
+/* ---------------- INSTAGRAM COLUMN SPLIT ---------------- */
+.leftSplit {
+    display:flex;
+    gap:10px;
+    height:88vh;
+}
 
-        .log {
-            margin: 4px 0;
-            padding: 4px;
-            border-left: 3px solid #38bdf8;
-        }
+/* FEED LEFT */
+.feedBox {
+    flex:2;
+    display:flex;
+    flex-direction:column;
+}
 
-        .attack { border-left-color: #ef4444; color: #f87171; }
-        .defense { border-left-color: #22c55e; color: #4ade80; }
+.feed {
+    height:70vh;
+    overflow-y:auto;
+}
 
-        /* ALERT */
-        .alert {
-            position: fixed;
-            top: 70px;
-            right: 20px;
-            background: rgba(239,68,68,0.9);
-            padding: 10px 15px;
-            border-radius: 8px;
-            display: none;
-        }
+/* LIVE FEED RIGHT */
+.liveBox {
+    flex:1;
+    display:flex;
+    flex-direction:column;
+}
 
-        canvas {
-            background: rgba(0,0,0,0.4);
-            border-radius: 12px;
-        }
-    </style>
+.userlog {
+    height:75vh;
+    overflow-y:auto;
+    background: rgba(0,0,0,0.4);
+    padding:10px;
+    border-radius:10px;
+    font-size:12px;
+}
+
+/* STORIES */
+.stories {
+    display:flex;
+    gap:10px;
+    overflow-x:auto;
+    padding-bottom:10px;
+}
+
+.story {
+    text-align:center;
+    font-size:11px;
+}
+
+.story img {
+    width:55px;
+    height:55px;
+    border-radius:50%;
+    border:2px solid #ec4899;
+}
+
+/* POSTS */
+.post {
+    background: rgba(15,23,42,0.8);
+    padding:10px;
+    margin-bottom:12px;
+    border-radius:14px;
+}
+
+.post img {
+    width:100%;
+    border-radius:10px;
+}
+
+.post-title {
+    font-size:14px;
+    font-weight:600;
+    margin:5px 0;
+}
+
+.actions span {
+    margin-right:12px;
+    cursor:pointer;
+}
+
+/* MTD */
+.port {
+    font-size:44px;
+    text-align:center;
+    color:#22c55e;
+    font-weight:bold;
+}
+
+.log {
+    height:180px;
+    overflow-y:auto;
+    background: rgba(0,0,0,0.5);
+    padding:10px;
+    border-radius:10px;
+    font-size:12px;
+}
+
+canvas {
+    width:100% !important;
+    height:240px !important;
+}
+
+/* ATTACKER */
+.attackLog {
+    height:88vh;
+    overflow-y:auto;
+    background: rgba(0,0,0,0.6);
+    padding:10px;
+    border-radius:10px;
+    font-size:12px;
+}
+
+</style>
 </head>
 
 <body>
 
-<!-- TOP -->
 <div class="topbar">
-    <div class="logo">🛡 DynamicShield SOC</div>
-    <div class="status">SYSTEM ACTIVE</div>
+    <div class="logo">🛡 One Solution</div>
+    <div class="status">LIVE SYSTEM</div>
 </div>
 
-<div id="alert" class="alert">⚠ Attack Detected</div>
+<div class="container">
 
-<!-- GRID -->
-<div class="grid">
+<!-- ================= COLUMN 1 (INSTAGRAM SPLIT) ================= -->
+<div class="card">
 
-    <!-- PORT -->
-    <div class="card">
-        <h3>Active Port (MTD)</h3>
-        <div class="port" id="port">---</div>
-        <p style="text-align:center;color:#94a3b8;">Dynamic Attack Surface</p>
+<h3>📱 Secure Feed</h3>
+
+<div class="stories">
+    <div class="story"><img src="https://i.pravatar.cc/55?img=1"><p>You</p></div>
+    <div class="story"><img src="https://i.pravatar.cc/55?img=2"><p>Alex</p></div>
+    <div class="story"><img src="https://i.pravatar.cc/55?img=3"><p>Sam</p></div>
+</div>
+
+<!-- SPLIT AREA -->
+<div class="leftSplit">
+
+    <!-- FEED -->
+    <div class="feedBox">
+        <div class="feed" id="feed"></div>
     </div>
 
-    <!-- CHART -->
-    <div class="card">
-        <h3>Attack vs Defense</h3>
-        <canvas id="chart"></canvas>
-    </div>
-
-    <!-- THREAT -->
-    <div class="card">
-        <h3>Threat Intelligence</h3>
-        <p>Level: <span id="threat">LOW</span></p>
-        <p>Attacks: <span id="attacks">0</span></p>
-        <p>Defenses: <span id="defenses">0</span></p>
+    <!-- LIVE USER FEED (MOVED HERE) -->
+    <div class="liveBox">
+        <h4 style="margin:5px 0;">💬 Live Activity</h4>
+        <div class="userlog" id="userLog"></div>
     </div>
 
 </div>
 
-<!-- SECOND ROW -->
-<div class="grid">
+</div>
 
-    <!-- NETWORK MAP -->
-    <div class="card">
-        <h3>🌐 Hacker Network Map</h3>
-        <canvas id="map" width="400" height="250"></canvas>
-    </div>
+<!-- ================= MTD ================= -->
+<div class="card">
 
-    <!-- LOGS -->
-    <div class="card" style="grid-column: span 2;">
-        <h3>Live Security Timeline</h3>
-        <div id="logs"></div>
-    </div>
+<h3>⚙️ MTD System</h3>
+
+<div class="port" id="port">---</div>
+
+<h4>Security Logs</h4>
+<div class="log" id="logs"></div>
+
+<h4>Attack vs Defense</h4>
+<canvas id="chart"></canvas>
+
+</div>
+
+<!-- ================= ATTACKER ================= -->
+<div class="card">
+
+<h3>💀 Attacker Console</h3>
+<div class="attackLog" id="attackLog"></div>
+
+</div>
 
 </div>
 
 <script>
 
-/* ---------------- CHART ---------------- */
 let chart;
-let lastAttack = 0;
 
-function initChart() {
-    const ctx = document.getElementById("chart");
-    chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['Attacks', 'Defenses'],
-            datasets: [{
-                data: [0,0],
-                backgroundColor: ['#ef4444','#22c55e']
+/* CHART */
+function initChart(){
+    const ctx=document.getElementById("chart");
+
+    chart=new Chart(ctx,{
+        type:"bar",
+        data:{
+            labels:["Attacks","Defenses"],
+            datasets:[{
+                data:[0,0],
+                backgroundColor:["#ef4444","#22c55e"]
             }]
         },
-        options: { plugins: { legend: { display: false } } }
+        options:{
+            responsive:true,
+            maintainAspectRatio:false,
+            plugins:{legend:{display:false}},
+            scales:{y:{beginAtZero:true}}
+        }
     });
 }
 
-/* ---------------- ALERT ---------------- */
-function showAlert(msg) {
-    let a = document.getElementById("alert");
-    a.innerText = msg;
-    a.style.display = "block";
-    setTimeout(()=>a.style.display="none",2000);
+/* POSTS */
+let images=[
+ "https://picsum.photos/500/300?1",
+ "https://picsum.photos/500/300?2",
+ "https://picsum.photos/500/300?3",
+ "https://picsum.photos/500/300?4",
+ "https://picsum.photos/500/300?5"
+];
+
+function createPost(img){
+    let div=document.createElement("div");
+    div.className="post";
+
+    div.innerHTML=`
+        <b>@secure_user</b>
+        <div class="post-title">Image</div>
+        <img src="${img}">
+        <p>Encrypted media content</p>
+
+        <div class="actions">
+            <span onclick="like(this)">❤️ Like <span>0</span></span>
+            <span onclick="comment(this)">💬 Comment</span>
+            <span onclick="follow()">➕ Follow</span>
+        </div>
+
+        <div class="commentBox"></div>
+    `;
+
+    document.getElementById("feed").appendChild(div);
 }
 
-/* ---------------- UPDATE DATA ---------------- */
-function update() {
+/* LIVE USER */
+function userLog(msg){
+    let box=document.getElementById("userLog");
+    let p=document.createElement("p");
+    p.innerText=msg;
+    box.appendChild(p);
+    box.scrollTop=box.scrollHeight;
+}
+
+/* ACTIONS */
+function like(el){
+    let span=el.querySelector("span");
+    span.innerText=parseInt(span.innerText)+1;
+    userLog("❤️ You liked the photo");
+}
+
+function comment(btn){
+    let text=prompt("Comment:");
+    if(!text)return;
+
+    let box=btn.closest(".post").querySelector(".commentBox");
+
+    let p=document.createElement("p");
+    p.innerText="💬 "+text;
+    box.appendChild(p);
+
+    userLog("💬 You commented: "+text);
+}
+
+function follow(){
+    userLog("👤 You followed a user");
+}
+
+/* BACKEND */
+function update(){
     fetch("/get-data")
     .then(r=>r.json())
     .then(d=>{
 
-        document.getElementById("port").innerText = d.port;
+        document.getElementById("port").innerText=d.port;
 
-        document.getElementById("attacks").innerText = d.attacks;
-        document.getElementById("defenses").innerText = d.defenses;
+        let logBox=document.getElementById("logs");
+        logBox.innerHTML="";
 
-        chart.data.datasets[0].data = [d.attacks, d.defenses];
+        d.logs.forEach(l=>{
+            let p=document.createElement("p");
+            if(l.includes("ATTACK")) p.style.color="red";
+            if(l.includes("DEFENSE")) p.style.color="green";
+            p.innerText=l;
+            logBox.appendChild(p);
+        });
+
+        chart.data.datasets[0].data=[d.attacks,d.defenses];
         chart.update();
 
-        // THREAT LEVEL
-        let t = "LOW";
-        if(d.attacks > 5) t = "HIGH";
-        else if(d.attacks > 2) t = "MEDIUM";
+        let atk=document.getElementById("attackLog");
+        atk.innerHTML="";
 
-        document.getElementById("threat").innerText = t;
-
-        // ALERT
-        if(d.attacks > lastAttack){
-            showAlert("⚠ New Attack Detected!");
-        }
-        lastAttack = d.attacks;
-
-        // LOGS
-        let logBox = document.getElementById("logs");
-        logBox.innerHTML = "";
-
-        d.logs.slice().reverse().forEach(l=>{
-            let div = document.createElement("div");
-            div.className = "log";
-
-            if(l.includes("ATTACK")) div.classList.add("attack");
-            if(l.includes("DEFENSE")) div.classList.add("defense");
-
-            div.innerText = l;
-            logBox.appendChild(div);
+        d.logs.forEach(l=>{
+            if(l.includes("ATTACK")){
+                let p=document.createElement("p");
+                p.innerText=l;
+                p.style.color="red";
+                atk.appendChild(p);
+            }
         });
 
     });
 }
 
-/* ---------------- NETWORK MAP ---------------- */
-const c = document.getElementById("map");
-const ctx = c.getContext("2d");
-
-let nodes = {
-    attacker: {x:80,y:60},
-    client: {x:80,y:180},
-    server: {x:320,y:120}
-};
-
-let packets = [];
-
-function drawNode(x,y,label,color){
-    ctx.beginPath();
-    ctx.arc(x,y,15,0,Math.PI*2);
-    ctx.fillStyle=color;
-    ctx.fill();
-    ctx.fillStyle="white";
-    ctx.fillText(label,x-20,y-20);
-}
-
-function addPacket(){
-    packets.push({x:80,y:60});
-}
-
-function animateMap(){
-    ctx.clearRect(0,0,400,250);
-
-    // lines
-    ctx.strokeStyle="rgba(255,255,255,0.1)";
-    ctx.beginPath();
-    ctx.moveTo(nodes.attacker.x,nodes.attacker.y);
-    ctx.lineTo(nodes.server.x,nodes.server.y);
-    ctx.stroke();
-
-    // nodes
-    drawNode(nodes.attacker.x,nodes.attacker.y,"Attacker","#ef4444");
-    drawNode(nodes.client.x,nodes.client.y,"Client","#38bdf8");
-    drawNode(nodes.server.x,nodes.server.y,"Server","#22c55e");
-
-    // packets
-    packets.forEach(p=>{
-        p.x += (nodes.server.x - p.x)/40;
-        p.y += (nodes.server.y - p.y)/40;
-
-        ctx.beginPath();
-        ctx.arc(p.x,p.y,4,0,Math.PI*2);
-        ctx.fillStyle="#ef4444";
-        ctx.fill();
-    });
-
-    packets = packets.filter(p=>Math.abs(p.x-nodes.server.x)>5);
-
-    requestAnimationFrame(animateMap);
-}
-
-/* ---------------- START ---------------- */
+/* INIT */
+images.forEach(createPost);
 initChart();
-setInterval(update,1000);
-setInterval(()=>packets.push({x:80,y:60}),1200);
-animateMap();
+setInterval(update,1200);
 
 </script>
 
