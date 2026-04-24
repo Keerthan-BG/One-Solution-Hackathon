@@ -1,130 +1,300 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>DynamicShield Dashboard</title>
+    <title>DynamicShield SOC Command Center</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
         body {
             margin: 0;
             font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f172a, #1e3a8a);
+            background: radial-gradient(circle at top, #0b1220, #000);
             color: white;
-            text-align: center;
+            overflow-x: hidden;
         }
 
-        h1 {
-            margin-top: 20px;
-            font-size: 32px;
+        /* TOP BAR */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 14px 20px;
+            background: rgba(0,0,0,0.6);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
             color: #38bdf8;
         }
 
-        .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .card {
-            width: 300px;
-            padding: 20px;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-            transition: transform 0.3s;
-        }
-
-        .card:hover {
-            transform: scale(1.05);
-        }
-
-        .value {
-            font-size: 28px;
-            margin-top: 10px;
-            color: #22c55e;
-        }
-
-        #logs {
-            height: 200px;
-            overflow-y: auto;
-            text-align: left;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px;
-            border-radius: 10px;
+        .status {
+            background: #22c55e;
+            padding: 4px 10px;
+            border-radius: 20px;
             font-size: 12px;
         }
 
-        canvas {
+        /* GRID */
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1fr;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .card {
             background: rgba(255,255,255,0.05);
-            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            padding: 15px;
+            backdrop-filter: blur(12px);
+        }
+
+        h3 {
+            margin-top: 0;
+            color: #38bdf8;
+        }
+
+        /* PORT */
+        .port {
+            font-size: 42px;
+            text-align: center;
+            color: #22c55e;
+            animation: glow 2s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #22c55e; }
+            to { text-shadow: 0 0 25px #22c55e; }
+        }
+
+        /* LOGS */
+        #logs {
+            height: 280px;
+            overflow-y: auto;
+            font-size: 12px;
+            background: rgba(0,0,0,0.4);
             padding: 10px;
+            border-radius: 10px;
+        }
+
+        .log {
+            margin: 4px 0;
+            padding: 4px;
+            border-left: 3px solid #38bdf8;
+        }
+
+        .attack { border-left-color: #ef4444; color: #f87171; }
+        .defense { border-left-color: #22c55e; color: #4ade80; }
+
+        /* ALERT */
+        .alert {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            background: rgba(239,68,68,0.9);
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        canvas {
+            background: rgba(0,0,0,0.4);
+            border-radius: 12px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>🚀 DynamicShield Dashboard</h1>
+<!-- TOP -->
+<div class="topbar">
+    <div class="logo">🛡 DynamicShield SOC</div>
+    <div class="status">SYSTEM ACTIVE</div>
+</div>
 
-<div class="container">
+<div id="alert" class="alert">⚠ Attack Detected</div>
 
+<!-- GRID -->
+<div class="grid">
+
+    <!-- PORT -->
     <div class="card">
-        <h2>Current Port</h2>
-        <div id="port" class="value">---</div>
+        <h3>Active Port (MTD)</h3>
+        <div class="port" id="port">---</div>
+        <p style="text-align:center;color:#94a3b8;">Dynamic Attack Surface</p>
     </div>
 
+    <!-- CHART -->
     <div class="card">
-        <h2>Attacks vs Defenses</h2>
+        <h3>Attack vs Defense</h3>
         <canvas id="chart"></canvas>
     </div>
 
+    <!-- THREAT -->
     <div class="card">
-        <h2>Live Logs</h2>
+        <h3>Threat Intelligence</h3>
+        <p>Level: <span id="threat">LOW</span></p>
+        <p>Attacks: <span id="attacks">0</span></p>
+        <p>Defenses: <span id="defenses">0</span></p>
+    </div>
+
+</div>
+
+<!-- SECOND ROW -->
+<div class="grid">
+
+    <!-- NETWORK MAP -->
+    <div class="card">
+        <h3>🌐 Hacker Network Map</h3>
+        <canvas id="map" width="400" height="250"></canvas>
+    </div>
+
+    <!-- LOGS -->
+    <div class="card" style="grid-column: span 2;">
+        <h3>Live Security Timeline</h3>
         <div id="logs"></div>
     </div>
 
 </div>
 
 <script>
+
+/* ---------------- CHART ---------------- */
 let chart;
+let lastAttack = 0;
 
 function initChart() {
-    const ctx = document.getElementById('chart');
+    const ctx = document.getElementById("chart");
     chart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['Attacks', 'Defenses'],
             datasets: [{
-                label: 'Count',
-                data: [0, 0],
-                backgroundColor: ['#ef4444', '#22c55e']
+                data: [0,0],
+                backgroundColor: ['#ef4444','#22c55e']
             }]
-        }
+        },
+        options: { plugins: { legend: { display: false } } }
     });
 }
 
-function updateData() {
+/* ---------------- ALERT ---------------- */
+function showAlert(msg) {
+    let a = document.getElementById("alert");
+    a.innerText = msg;
+    a.style.display = "block";
+    setTimeout(()=>a.style.display="none",2000);
+}
+
+/* ---------------- UPDATE DATA ---------------- */
+function update() {
     fetch("/get-data")
-    .then(res => res.json())
-    .then(data => {
+    .then(r=>r.json())
+    .then(d=>{
 
-        document.getElementById("port").innerText = data.port;
+        document.getElementById("port").innerText = d.port;
 
-        chart.data.datasets[0].data = [data.attacks, data.defenses];
+        document.getElementById("attacks").innerText = d.attacks;
+        document.getElementById("defenses").innerText = d.defenses;
+
+        chart.data.datasets[0].data = [d.attacks, d.defenses];
         chart.update();
 
-        const logsDiv = document.getElementById("logs");
-        logsDiv.innerHTML = data.logs.join("<br>");
-        logsDiv.scrollTop = logsDiv.scrollHeight;
+        // THREAT LEVEL
+        let t = "LOW";
+        if(d.attacks > 5) t = "HIGH";
+        else if(d.attacks > 2) t = "MEDIUM";
+
+        document.getElementById("threat").innerText = t;
+
+        // ALERT
+        if(d.attacks > lastAttack){
+            showAlert("⚠ New Attack Detected!");
+        }
+        lastAttack = d.attacks;
+
+        // LOGS
+        let logBox = document.getElementById("logs");
+        logBox.innerHTML = "";
+
+        d.logs.slice().reverse().forEach(l=>{
+            let div = document.createElement("div");
+            div.className = "log";
+
+            if(l.includes("ATTACK")) div.classList.add("attack");
+            if(l.includes("DEFENSE")) div.classList.add("defense");
+
+            div.innerText = l;
+            logBox.appendChild(div);
+        });
+
     });
 }
 
+/* ---------------- NETWORK MAP ---------------- */
+const c = document.getElementById("map");
+const ctx = c.getContext("2d");
+
+let nodes = {
+    attacker: {x:80,y:60},
+    client: {x:80,y:180},
+    server: {x:320,y:120}
+};
+
+let packets = [];
+
+function drawNode(x,y,label,color){
+    ctx.beginPath();
+    ctx.arc(x,y,15,0,Math.PI*2);
+    ctx.fillStyle=color;
+    ctx.fill();
+    ctx.fillStyle="white";
+    ctx.fillText(label,x-20,y-20);
+}
+
+function addPacket(){
+    packets.push({x:80,y:60});
+}
+
+function animateMap(){
+    ctx.clearRect(0,0,400,250);
+
+    // lines
+    ctx.strokeStyle="rgba(255,255,255,0.1)";
+    ctx.beginPath();
+    ctx.moveTo(nodes.attacker.x,nodes.attacker.y);
+    ctx.lineTo(nodes.server.x,nodes.server.y);
+    ctx.stroke();
+
+    // nodes
+    drawNode(nodes.attacker.x,nodes.attacker.y,"Attacker","#ef4444");
+    drawNode(nodes.client.x,nodes.client.y,"Client","#38bdf8");
+    drawNode(nodes.server.x,nodes.server.y,"Server","#22c55e");
+
+    // packets
+    packets.forEach(p=>{
+        p.x += (nodes.server.x - p.x)/40;
+        p.y += (nodes.server.y - p.y)/40;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,4,0,Math.PI*2);
+        ctx.fillStyle="#ef4444";
+        ctx.fill();
+    });
+
+    packets = packets.filter(p=>Math.abs(p.x-nodes.server.x)>5);
+
+    requestAnimationFrame(animateMap);
+}
+
+/* ---------------- START ---------------- */
 initChart();
-setInterval(updateData, 1000);
+setInterval(update,1000);
+setInterval(()=>packets.push({x:80,y:60}),1200);
+animateMap();
+
 </script>
 
 </body>
